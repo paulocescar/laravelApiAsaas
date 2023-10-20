@@ -2,45 +2,36 @@
 
 namespace App\Repositories\Asaas;
 
-use App\Models\ClientsAsaas;
-use App\Repositories\Asaas\AsaasApi;
+use App\Models\Invoices;
+use Illuminate\Support\Facades\Http;
 
-class AsaasClientsRepository
+class AsaasInvoicesRepository
 {
-    private $asaasApi;
-    public function __construct(AsaasApi $asaasApi)
-    {
-        $this->asaasApi = $asaasApi;
-    }
+    private $asaasApiUrl;
 
-    public function criarClienteAsaas(ClientsAsaas $client)
+    public function __construct()
     {
-        $url = '/api/v3/customers/';
-        $response = $this->asaasApi->asaasApiPost($url, $client->toArray());
+        $this->asaasApiUrl = env('ASAAS_API_MODE_SANDBOX') ? env('ASAAS_SANDBOX_URL') : env('ASAAS_PROD_URL');
         
+    }
+    public function criarCobranca(Invoices $client)
+    {
+        $url = $this->asaasApiUrl.'/api/v3/customers';
+        $response = Http::post($url, $client);
+
         return $response;
     }
 
-    public function criarCliente(array $cliente)
+    public function recuperarCobrancaPorId(string $idClient)
     {
-        return ClientsAsaas::create($cliente);
-    }
+        $url = $this->asaasApiUrl.'/api/v3/customers'.$idClient;
+        $response = Http::get($url);
 
-    public function atualizarCliente(array $client, $id = null)
-    {
-        return ClientsAsaas::where('id',$id)->update($client);
-    }
-
-    public function recuperarClientePorId(string $idClient)
-    {
-        $url = '/api/v3/customers/'.$idClient;
-        $response = $this->asaasApi->asaasApiGet($url);
-        
         return $response;
     }
 
 
-    public function recuperarClientes(string $name = "", 
+    public function recuperarCobrancas(string $name = "", 
                                     string $email = "", 
                                     string $cpfCnpj = "",
                                     string $groupName = "",  
@@ -48,48 +39,42 @@ class AsaasClientsRepository
                                     string $offset = "",
                                     string $limit = "")
     {
-        $url = '/api/v3/customers/';
-
+        $url = $this->asaasApiUrl.'/api/v3/customers/';
         $url .= $this->adapterFiltros($name, $email, $cpfCnpj, $groupName, $externalReference, $offset, $limit);
-        $response = $this->asaasApi->asaasApiGet($url);
+        
+        $response = Http::get($url);
 
         return $response;
     }
 
-    public function atualizarClienteAsaas(ClientsAsaas $client)
+    public function atualizarCobranca(string $idClient, Invoices $client)
     {
-        $url = '/api/v3/customers/'.$client->asaas_customer_id;
-        $response = $this->asaasApi->asaasApiPost($url, $client->toArray());
-
-        return $response;
-    }
-
-    public function removerClienteAsaas(string $idClient)
-    {
-        $url = '/api/v3/customers/'.$idClient;
-        $response = $this->asaasApi->asaasApiDelete($url, $idClient);
+        $url = $this->asaasApiUrl.'/api/v3/customers/'.$idClient;
+        $response = Http::post($url, $client);
 
         return $response;
     }
 
 
-    public function removerCliente($id)
+    public function removerCobranca(string $idClient, Invoices $client)
     {
-        return ClientsAsaas::find($id)->update(['lixeira' => 'sim']);
-    }
-
-
-    public function restaurarCliente(string $idClient)
-    {
-        $url = '/api/v3/customers/'.$idClient.'/restore';
-        $response = $this->asaasApi->asaasApiGet($url);
+        $url = $this->asaasApiUrl.'/api/v3/customers/'.$idClient;
+        $response = Http::delete($url, $client);
 
         return $response;
     }
-    public function recuperarNotificacoesCliente(string $idClient)
+
+    public function restaurarCobranca(string $idClient, Invoices $client)
     {
-        $url = '/api/v3/customers/'.$idClient.'/notifications';
-        $response = $this->asaasApi->asaasApiGet($url);
+        $url = $this->asaasApiUrl.'/api/v3/customers/'.$idClient.'/restore';
+        $response = Http::get($url, $client);
+
+        return $response;
+    }
+    public function recuperarNotificacoesCobranca(string $idClient, Invoices $client)
+    {
+        $url = $this->asaasApiUrl.'/api/v3/customers/'.$idClient.'/notifications';
+        $response = Http::get($url, $client);
 
         return $response;
     }

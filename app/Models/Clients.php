@@ -9,24 +9,13 @@ class Clients extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'client_asaas_id',
         'name',
         'cpfCnpj',
+        'password',
         'email',
-        'phone',
-        'mobilePhone',
-        'address',
-        'addressNumber',
-        'complement',
-        'province',
-        'postalCode',
-        'externalReference',
-        'notificationDisabled',
-        'additionalEmails',
-        'municipalInscription',
-        'stateInscription',
-        'observations',
-        'groupName',
-        'company',
+        'trial',
+        'premium',
         'lixeira'
     ];
 }

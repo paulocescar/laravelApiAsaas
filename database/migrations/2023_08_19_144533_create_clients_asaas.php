@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('clients_asaas', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('asaas_id');
+            $table->string('asaas_customer_id');
             $table->string('name');
             $table->string('cpfCnpj');
             $table->string('email')->nullable();
